@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html>
+  <!--
+        QUIZ GAME!
+
+        RULES:
+        / The player must guess correctly a certain amount of questions
+        / Each correct answer gives him one point
+        / Answers could be â€œmultipleâ€ or â€œtrue/falseâ€
+        / At the end of the game, the user must know his total score
+
+        QUESTIONS:
+        / You can get them from this URL ( http://bit.ly/strive_QUIZZ ) or you can write your own
+        / Could be multiple of boolean (true / false)
+        / [EXTRA] Show if the answer was wrong or correct after clicking
+        / [EXTRA] Present them â€œone a timeâ€
+
+        HINTS:
+        / Keep a global variable â€œscoreâ€ for the score
+        / Keep a variable â€œquestionNumberâ€ for the â€œquestionâ€ the user is answering
+        / When â€œquestionNumberâ€ is bigger then the available questions, present the score
+        / Start working with the question saved in a variable, and then include AJAX etc
+        / Start with the easier version and THEN implement the â€œEXTRAsâ€
+        / Please debug everything / try it on the console to be sure of what to expect from your code
+
+        EXTRA:
+        / Show if the answer was wrong or correct after clicking
+        / Present questions one a time
+        / Let the user select difficulty and number of questions (you can get q/a from https://opentdb.com/api.php?amount=10&category=18&difficulty=easy modifying amount and difficulty)
+
+    -->
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+  <head>
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Work+Sans:300,600);
+      body *{
+        box-sizing: border-box;
+      }
+      body{
+        font-size: 20px;
+        font-family: 'Work Sans', sans-serif;
+        color: #333;
+        font-weight: 300;
+        text-align: center;
+        background-color: #f8f6f0;
+      }
+      h1{
+        font-weight: 300;
+        margin: 0px;
+        padding: 10px;
+        font-size: 20px;
+        background-color: #004c97;
+        color: #fff;
+      }
+      .card{
+          height: 100%;
+          width: 50%;
+          margin: auto;
+      }
+      .card .input-group *{
+          width: 100%;
+      }
+      .question{
+        font-size: 30px;
+        margin-bottom: 10px;
+      }
+      .answers {
+        margin-bottom: 20px;
+        text-align: left;
+        display: inline-block;
+      }
+      .answers label{
+        display: block;
+        margin-bottom: 20px;
+        position: relative;
+        margin-top: 10px;
+      }
+      button{
+        font-family: 'Work Sans', sans-serif;
+        font-size: 22px;
+        background-color: #279;
+        color: #fff;
+        border: 0px;
+        border-radius: 3px;
+        padding: 20px;
+        cursor: pointer;
+        margin-top: 50px;
+      }
+      button:hover{
+        background-color: #38a;
+      }
+      .slide{
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        width: 100%;
+        z-index: 1;
+        opacity: 0;
+        transition: opacity 0.5s;
+      }
+      .active-slide{
+        opacity: 1;
+        z-index: 2;
+      }
+      .quiz-container{
+        position: relative;
+        height: 200px;
+        margin-top: 40px;
+      }
+      
+      .answers input[type='radio'] {
+        display: none;
+        }
+
+      .answers label::before {
+        content: "";
+        display: block;
+        position: absolute;
+        top: 5px;
+        left: -35px;
+        margin: 0 5px 5px 5px;
+        width: 20px;
+        height: 20px;
+        border-radius: 11px;
+        border: 2px solid #004c97;
+        background-color: transparent;
+        }
+
+      .answers input[type=radio]:checked + label::after {
+        border-radius: 11px;
+        width: 10px;
+        height: 10px;
+        position: absolute;
+        top: 10px;
+        left: -25px;
+        content: " ";
+        display: block;
+        background: #004c97;
+      }
+
+      
+    @media (max-width: 575.98px) {
+      .answers label{
+          font-size: larger;
+          font-weight: bolder;
+          margin-top: 1.5em;
+      }
+      .quiz-container{
+        height: 75vh;
+      }
+    }
+
+    </style>
+  </head>
+  <body>
+    <section id="container">
+      <h1 class="title">Quiz For Fun</h1>
+      <!-- <div class="row"></div> -->
+      <div class="card pre">
+        <div class="input-group">
+            <label for="trivia_amount">Select Number of Questions:</label>
+            <input type="number" name="trivia_amount" id="trivia_amount" class="form-control" min="1" max="50" value="10">
+        </div>
+        <div class="input-group">
+            <label for="trivia_category">Select Category: </label>
+            <select class="custom-select" id="inputGroupSelect02" aria-label="Example select with button addon">
+                <option value="">Any Category</option>
+                <option value="9">General Knowledge</option>
+                <option value="10">Entertainment: Books</option>
+                <option value="11">Entertainment: Film</option>
+                <option value="12">Entertainment: Music</option>
+                <option value="13">Entertainment: Musicals &amp; Theatres</option>
+                <option value="14">Entertainment: Television</option>
+                <option value="15">Entertainment: Video Games</option>
+                <option value="16">Entertainment: Board Games</option>
+                <option value="17">Science &amp; Nature</option>
+                <option value="18">Science: Computers</option>
+                <option value="19">Science: Mathematics</option>
+                <option value="20">Mythology</option>
+                <option value="21">Sports</option>
+                <option value="22">Geography</option>
+                <option value="23">History</option>
+                <option value="24">Politics</option>
+                <option value="25">Art</option>
+                <option value="26">Celebrities</option>
+                <option value="27">Animals</option>
+                <option value="28">Vehicles</option>
+                <option value="29">Entertainment: Comics</option>
+                <option value="30">Science: Gadgets</option>
+                <option value="31">Entertainment: Japanese Anime &amp; Manga</option>
+                <option value="32">Entertainment: Cartoon &amp; Animations</option>	
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="trivia_difficulty">Select Difficulty: </label>
+            <select class="custom-select" id="inputGroupSelect03" aria-label="Example select with button addon">
+                <option value="">Any Difficulty</option>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="trivia_type">Select Type: </label>
+            <select class="custom-select" id="inputGroupSelect04" aria-label="Example select with button addon">
+              <option value="">Any Type</option>
+              <option value="multiple">Multiple</option>
+              <option value="boolean">True/False</option>
+            </select>
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary" type="button" id="start">Start Quiz</button>
+            </div>
+        </div>
+      </div>
+      <div class="quiz-container">
+        <div id="quiz" class="myQuiz"></div>
+      </div>
+      
+      <br>
+      <div class="control">
+        <button id="previous">Previous Question</button>
+        <button id="next">Next Question</button>
+        <button id="submit">Submit Quiz</button>
+      </div>
+      <br>
+      <div id="results" class="result"></div>
+    </section>
+
+    <script>
+
+        document.querySelector('.control').style.display = 'none'
+        document.querySelector('.input-group').style.display = 'block'
+        let startBtn = document.querySelector('#start')
+        
+        startBtn.addEventListener('click', startQuiz);
+       
+      function startQuiz() {
+        
+        let a = document.querySelector('#trivia_amount').value;
+        let b = document.querySelector('#inputGroupSelect02').value;
+        let c = document.querySelector('#inputGroupSelect03').value;
+        let d = document.querySelector('#inputGroupSelect04').value;
+        
+        document.querySelector('.control').style.display = 'block'
+        document.querySelector('.pre').style.display = 'none'
+          
+      
+      let quizContainer = document.querySelector('#quiz');
+      let resultsContainer = document.querySelector('#results');
+      let submitButton = document.querySelector('#submit');
+          
+      //console.log(opt)
+
+      let params = {
+        "amount": a,
+        "category": b,
+        "difficulty": c,
+        "type": d
+      };
+
+        let query = Object.keys(params)
+             .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+             .join('&');
+
+      let url = 'https://opentdb.com/api.php?' + query
+      console.log(url)
+
+       /***************************************/
+    fetch(url)
+    //fetch('https://opentdb.com/api.php?amount=10&difficulty=easy')
+    .then(res => res.json())
+    .then(data => {
+        // code to handle the response
+        const questions = data.results
+        //console.log(questions)
+        function showquestions(){
+        for (let i = 0; i < questions.length; i++) {
+
+          questions[i].incorrect_answers.push(questions[i].correct_answer)
+          let allAnswers = [...questions[i].incorrect_answers]
+          
+          var slide = document.createElement("div");
+          var question = document.createElement("div");
+          var answers = document.createElement("div");
+
+          
+          for (let j = 0; j < allAnswers.length; j++) {
+
+            
+            var newLabel = document.createElement('LABEL');
+            var newInput = document.createElement('input');
+
+            slide.className = 'slide';
+            question.className = 'question';
+            answers.className = 'answers';
+
+            
+            newInput.type = 'radio';
+            newInput.name = `question${i}`;
+            newInput.value = `${allAnswers[j]}`;
+            newInput.id = `question${i}answer${j}`;
+
+            
+            newLabel.innerText=`${allAnswers[j]}`;
+            newLabel.setAttribute("for",`question${i}answer${j}`);
+
+            question.innerText = `${questions[i].question}`;
+
+            answers.appendChild(newInput);
+            answers.appendChild(newLabel);
+
+            slide.appendChild(question);
+            slide.appendChild(answers);
+          }
+
+          quizContainer.appendChild(slide);
+        }
+    }
+
+    function displayResult(){
+
+    const answerContainers = quizContainer.querySelectorAll('.answers');
+
+    let counter = 0;
+
+    for (let i = 0; i < questions.length; i++) {
+
+    const answerContainer = answerContainers[i];
+    const checked = `input[name=question${i}]:checked`;
+    const userChoice = (answerContainer.querySelector(checked) || {}).value;
+    
+    if(userChoice === questions[i].correct_answer){
+        counter++;
+        answerContainers[i].style.color = 'lightgreen';
+    }
+    else{
+        answerContainers[i].style.color = 'red';
+    }
+    
+    }
+    resultsContainer.innerHTML = `Your score is ${counter} out of ${questions.length}`;
+    }
+
+    function showSlide(n) {
+            slides[currentSlide].classList.remove('active-slide');
+            slides[n].classList.add('active-slide');
+            currentSlide = n;
+            if(currentSlide === 0){
+            previousButton.style.display = 'none';
+            }
+            else{
+            previousButton.style.display = 'inline-block';
+            }
+            if(currentSlide === slides.length-1){
+            nextButton.style.display = 'none';
+            submitButton.style.display = 'inline-block';
+            }
+            else{
+            nextButton.style.display = 'inline-block';
+            submitButton.style.display = 'none';
+            }
+        }
+
+        function showNextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        function showPreviousSlide() {
+            showSlide(currentSlide - 1);
+        }
+
+    showquestions()
+
+      // Pagination
+      const previousButton = document.querySelector("#previous");
+      const nextButton = document.querySelector("#next");
+      const slides = document.querySelectorAll(".slide");
+      let currentSlide = 0;
+
+      // Show the first slide
+      showSlide(currentSlide);
+
+      // Event listeners
+      submitButton.addEventListener('click', displayResult);
+      previousButton.addEventListener("click", showPreviousSlide);
+      nextButton.addEventListener("click", showNextSlide);
+
+    }).catch(err => {
+        console.error('Error: ', err);
+    });
+
+
+        //IF YOU ARE DISPLAYING ALL THE QUESTIONS TOGETHER:
+        //HINT: for each question, create a container with the "question"
+        //create a radio button https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/radio with, as option the both the correct answer and the incorrect answers
+        //when EVERY question has an answer (google for how to get a value from a radio button with JS)
+        //IF YOU ARE DISPLAYING ONE QUESTION AT A TIME
+        //Display first question with a title + radio button
+        //when the user select the answer, pick the next question and remove this from the page after added in a varible the users' choice.
+      }
+
+      //HOW TO calculate the result
+      //You can do it in 2 ways:
+      //If you are presenting all questions together, just take all the radio buttons and check if the selected answer === correct_answer
+      //If you are presenting one question at a time, just add one point or not to the user score if the selected answer === correct_answer
+    </script>
+
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  </body>
+</html>
