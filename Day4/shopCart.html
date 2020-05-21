@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!--
+            You are creating the "shopping cart experience" for a Online Marketplace.
+            You have the list of the available books from the current API:
+            https://striveschool.herokuapp.com/books
+            What you have to do is:
+            0) Get all the products from the API using a fetch
+            1) Display the list of items available on the page using template literals `` and .forEach
+            2) Add a "add to cart button"
+            3) When the button is pressed, change the style of the item and add it to another list
+            4) Add "skip" button next to each item
+            5) When pressed, the button should remove from the page the item not interesting from the user
+            6) Add a "search bar". When the user types more than 3 chars, you should filter the content of the page to show only the items with a matching name (hint: use .filter method)
+            7) Allow the user to delete items from the cart list
+            
+            [EXTRA]
+            8) Add a "clean cart" button, to clean the whole list.
+            9) Create a second "detail page" for the product. When the user clicks on a product name, the app should redirect him to the secondary page, passing the ASIN in query string
+            10) In page "detail" show some details of the selected product
+        -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="description" content="" />
+  <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors" />
+  <meta name="generator" content="Jekyll v3.8.5" />
+  <title>ShoppingCart example · Bootstrap</title>
+
+  <link rel="canonical" href="https://getbootstrap.com/docs/4.3/examples/album/" />
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+</head>
+
+<body>
+    <div class="container">
+        <div class="input-group my-3">
+            <!-- <input type="text" id="searchItems" class="form-control" placeholder="Search items" aria-label="Recipient's username" aria-describedby="button-addon2"> -->
+            <input type="text" id="searchItems" placeholder="Search items by title" autocomplete="off" onkeyup="filterStuff()">
+        </div>
+        <!-- <div class="row" id="prodContainer"></div>
+        <div class="row" id="cartContainer"></div> -->
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col col-md-9 my-3 border border-dark d-flex flex-wrap justify-content-between" id="prodContainer"></div>
+            <div class="col col-md-3 my-3 border border-left-0 border-dark" id="cartContainer">
+                <hr>
+                <p class="text-uppercase text-center">Shopping Cart</p>
+                <hr>
+            </div>
+        </div>
+    </div>
+
+
+
+    
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+  integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+  integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
+</script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+  integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+</script>
+
+<script>
+    window.onload = () => {
+        getAllProd('books')
+    }
+
+    let fetchedProduct = []
+
+    const getAllProd = item => {
+        //document.querySelector('.album .container .row').innerHTML = ''
+        const url = `https://striveschool.herokuapp.com/${item}?offset=0&limit=50`
+        fetch(url)
+            .then(res => res.json())
+            .then(books => {
+                console.log(books) 
+                fetchedProduct = books
+
+                const prod = fetchedProduct.map(books => books)
+                
+                console.log(prod) 
+
+                const prodContainer = document.querySelector('#prodContainer')
+
+                fetchedProduct.forEach(books => {
+                    prodContainer.innerHTML += 
+                    `<div class="col col-md-4 card my-3 shadow-sm">
+                        <img class="bd-placeholder-img card-img-top" width="100%" height="225" src=${books.img} />
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center btn-group">
+                                <button type="button" class="btn btn-sm btn-outline-secondary addToCart">
+                                    Add To Cart
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary remove">
+                                    Skip
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    `
+                });
+
+                const addCartBtn = document.querySelectorAll('.addToCart')
+                const cartContainer = document.querySelector('#cartContainer')
+
+                for (let i = 0; i < addCartBtn.length; i++) {
+                    addCartBtn[i].addEventListener("click", function(e) {
+                        cartContainer.innerHTML +=
+                        `<div class="col col-md-6 card my-3 shadow-sm px-3 pt-3">
+                            <img class="bd-placeholder-img card-img-top" width="100%" height="225" src=${e.currentTarget.parentNode.parentNode.parentNode.querySelector('img').src} />
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center btn-group">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary removeFromCart">
+                                        Remove From Cart
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        `
+                        
+                    
+                        const removeFromCart = document.querySelectorAll('.removeFromCart')
+                        
+                        for (let i = 0; i < removeFromCart.length; i++) {
+                            //console.log('test')
+                            removeFromCart[i].addEventListener("click", function(e) {
+                                e.currentTarget.parentNode.parentNode.parentNode.remove();
+                            }, false);
+                        }
+                        //console.log(cartContainer)
+                    }, false);
+
+                }
+
+                const removeBtn = document.querySelectorAll('.remove')
+                
+                  for (let i = 0; i < removeBtn.length; i++) {
+                      //console.log('test')
+                        removeBtn[i].addEventListener("click", function(e) {
+                          e.currentTarget.parentNode.parentNode.parentNode.remove();
+                      }, false);
+                  }
+
+                
+            }).catch(err => {
+            console.error('Error: ', err);
+            alert(err);
+        });
+      }
+
+      
+      const filterStuff = () => {
+            const filterSearch = document.querySelector("#searchItems").value.toLowerCase()
+            const prodContainer = document.querySelector("#prodContainer")
+            
+            prodContainer.innerHTML = "";
+
+            const filteredItems = fetchedProduct.filter(books => books.title.toLowerCase().includes(filterSearch))
+            
+            filteredItems.forEach(currentItem => {
+                prodContainer.innerHTML += 
+                `<div class="col col-md-4 card my-3 shadow-sm">
+                        <img class="bd-placeholder-img card-img-top" width="100%" height="225" src=${currentItem.img} />
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center btn-group">
+                                <button type="button" class="btn btn-sm btn-outline-secondary addToCart">
+                                    Add To Cart
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary remove">
+                                    Skip
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    `
+            })
+
+            const removeFromCart = document.querySelectorAll('.remove')
+                        
+            for (let i = 0; i < removeFromCart.length; i++) {
+                //console.log('test')
+                removeFromCart[i].addEventListener("click", function(e) {
+                    e.currentTarget.parentNode.parentNode.parentNode.remove();
+                }, false);
+            }
+
+                        
+            const addCartBtn = document.querySelectorAll('.addToCart')
+            const cartContainer = document.querySelector('#cartContainer')
+
+            for (let i = 0; i < addCartBtn.length; i++) {
+                addCartBtn[i].addEventListener("click", function(e) {
+                    cartContainer.innerHTML +=
+                    `<div class="col col-md-6 card my-3 shadow-sm px-3 pt-3">
+                        <img class="bd-placeholder-img card-img-top" width="100%" height="225" src=${e.currentTarget.parentNode.parentNode.parentNode.querySelector('img').src} />
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center btn-group">
+                                <button type="button" class="btn btn-sm btn-outline-secondary removeFromCart">
+                                    Remove From Cart
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    `
+                    
+                
+                    const removeFromCart = document.querySelectorAll('.removeFromCart')
+                    
+                    for (let i = 0; i < removeFromCart.length; i++) {
+                        //console.log('test')
+                        removeFromCart[i].addEventListener("click", function(e) {
+                            e.currentTarget.parentNode.parentNode.parentNode.remove();
+                        }, false);
+                    }
+                    //console.log(cartContainer)
+                }, false);
+
+            }
+        
+        }
+</script>
+</body>
+
+</html>
