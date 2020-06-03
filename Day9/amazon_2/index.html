@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+      integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
+      crossorigin="anonymous"
+    />
+
+    <title>MY AMAZON STORE</title>
+
+    <style>
+        .container{
+            text-align: center;
+        }
+        /* .product{
+            display: inline-block;
+        }
+        .product .col{
+            display: inline-block;
+        } */
+        /* #content{
+            margin-bottom: 5rem;
+        } */
+      /* .slide{
+        position: absolute;
+        left: 2.5rem;
+        top: 0px;
+        width: 100%;
+        z-index: 1;
+        opacity: 0;
+        transition: opacity 0.5s;
+      }
+      .active-slide{
+        opacity: 1;
+        z-index: 2;
+      } */
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href="#">MyAmazon-LOGO</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="/"
+              >Home <span class="sr-only">(current)</span></a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="backoffice.html">Backoffice</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+        
+    <!-- <div class="container my-5">
+        <div id="pagination-wrapper"></div>
+    </div> -->
+
+    <div class="container">
+      <h1>MY AMAZON STORE</h1>
+      <h2 class="my-2">
+        Available products
+      </h2>
+      <div class="row" id="content">
+          
+      </div>
+    </div>
+
+    <div class="container my-2">
+      <div id="pagination-wrapper"></div>
+  </div>
+    
+    <script src="helper.js"></script>
+
+    <script>
+
+      window.onload = async () => {
+        
+        let content = document.querySelector('#content')
+
+        try{
+        let items = await getProducts();
+
+        if (items.length > 0) {
+
+                    
+          let state = {
+              'querySet': items,
+
+              'page': 1,
+              'rows': 4,
+              'window': 5,
+          }
+
+          //console.log(state.querySet)
+
+          showPage()
+
+          function pagination(querySet, page, rows) {
+
+              let trimStart = (page - 1) * rows
+              let trimEnd = trimStart + rows
+
+              let trimmedData = querySet.slice(trimStart, trimEnd)
+
+              let pages = Math.round(querySet.length / rows);
+
+              return {
+                  'querySet': trimmedData,
+                  'pages': pages,
+              }
+          }
+
+          function pageButtons(pages) {
+              let wrapper = document.getElementById('pagination-wrapper')
+
+              wrapper.innerHTML = ``
+            console.log('Pages:', pages)
+
+              let maxLeft = (state.page - Math.floor(state.window / 2))
+              let maxRight = (state.page + Math.floor(state.window / 2))
+
+              if (maxLeft < 1) {
+                  maxLeft = 1
+                  maxRight = state.window
+              }
+
+              if (maxRight > pages) {
+                  maxLeft = pages - (state.window - 1)
+                  
+                  if (maxLeft < 1){
+                    maxLeft = 1
+                  }
+                  maxRight = pages
+              }
+              
+              
+
+              for (let page = maxLeft; page <= maxRight; page++) {
+                wrapper.innerHTML += `<button value=${page} class="page btn btn-sm btn-info">${page}</button>`
+              }
+
+              if (state.page != 1) {
+                  wrapper.innerHTML = `<button value=${1} class="page btn btn-sm btn-info">&#171; First</button>` + wrapper.innerHTML
+              }
+
+              if (state.page != pages) {
+                  wrapper.innerHTML += `<button value=${pages} class="page btn btn-sm btn-info">Last &#187;</button>`
+              }
+
+              $('.page').on('click', function() {
+                  $('#content').empty()
+
+                  state.page = Number($(this).val())
+
+                  showPage()
+              })
+
+          }
+
+
+          function showPage() {
+              let content = document.querySelector('#content')
+
+              let data = pagination(state.querySet, state.page, state.rows)
+              let myList = data.querySet
+
+              for (let i in myList) {
+                  
+                  let slide = document.createElement("div");
+
+                  let img = `<div class="card border border-success rounded-left pt-4" style="width: 15rem; height: 15rem;"> 
+                                  <a href="detail.html?id=${myList[i]._id}"><img class="img-fluid" src=${myList[i].imageUrl} /></a>
+                                  </div>`
+                  let prod =`               
+                                  <div class="card border border-info rounded-right pt-4 text-left" style="width: 15rem; height: 15rem;"> 
+                                  <p>Name: ${myList[i].name}</p>
+                                  <p>Description: ${myList[i].description}</p>
+                                  <p>Brand: ${myList[i].brand}</p>
+                                  <p>Price: ${myList[i].price}</p> </div>`;
+
+                  slide.className = 'col col-md-3'
+                  slide.innerHTML += img
+                  slide.innerHTML += prod
+
+                  // content.innerHTML = ''
+                  content.appendChild(slide)
+                  //content.innerHTML += slide
+              }
+
+              pageButtons(data.pages)
+          }
+
+          
+
+        } else {
+          content.innerHTML = "<h1>No product in store</h1>";
+        }
+      }catch (err) {
+          console.log("err", err);
+          alert(err);
+        }
+
+    
+      };
+    </script>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+      integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+      integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+      integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

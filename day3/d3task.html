@@ -145,9 +145,6 @@
           This page will dynamically load pictures from the web, and display them in a cool way!
         </p>
         <p>
-          <div class="input-group mb-3">
-            <input type="text" id="getText" class="form-control" placeholder="Give a parameter" aria-label="Recipient's username" aria-describedby="button-addon2">
-          </div>
           <a href="#" class="btn btn-primary my-2">Load Images</a>
           <a href="#" class="btn btn-secondary my-2">Load Secondary Images</a>
         </p>
@@ -458,12 +455,8 @@
   <script>      
   
       const imageBtn = document.querySelector('.btn-primary')
-      const secImageBtn = document.querySelector('.btn-secondary')
         
       imageBtn.addEventListener('click', getImage);
-      secImageBtn.addEventListener('click', getSecImage);
-
-      
 
       function getImage() {
         document.querySelector('.album .container .row').innerHTML = ''
@@ -471,103 +464,7 @@
         fetch(url)
             .then(res => res.json())
             .then(data => {
-                //console.log(data.images)                
-
-                for (let index = 0; index < data.images.length; index++) {
-                    const element = data.images[index];
-
-                    let content = document.createElement('div')
-                    content.className = 'col-md-4'
-
-                    content.innerHTML =
-                    `<div class="card mb-4 shadow-sm">
-                        <img class="bd-placeholder-img card-img-top" width="100%" height="225" src=${element.url} />
-                        <div class="card-body">
-                            <p class="card-text">
-                            This is a wider card with supporting text below as a natural
-                            lead-in to additional content. This content is a little bit
-                            longer.
-                            </p>
-                            <div class="d-flex justify-content-between align-items-center">
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#myModal${index}">
-                                View
-                                </button>
-                                <button type="button" class="btn btn-sm btn-outline-secondary remove">
-                                Hide
-                                </button>
-                                <div id="myModal${index}" class="modal fade" tabindex="-1" role="dialog">
-                                  <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-body">
-                                            <img src=${element.url} class="img-responsive bd-placeholder-img card-img-top" width="100%" height="225" />
-                                        </div>
-                                    </div>
-                                  </div>
-                                </div>
-                            </div>
-                            <small class="text-muted">${element.id}</small>
-                            </div>
-                        </div>
-                    </div>`
-                    
-                    document.querySelector('.album .container .row').appendChild(content)
-
-                }
-
-                let al = document.createElement('div')
-                
-                al.innerHTML = 
-                `
-                  <div id="moo" class="alert alert-danger alert-dismissible w-25 text-center" style="margin: 0 auto" role="alert" auto-close="5000">
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span>
-                    </button>
-                    ${data.images.length} images loaded
-                  </div>
-                  `
-                  document.querySelector('body').insertBefore(al,document.querySelector('main'))
-                
-                $(function() {
-                  var alert = $('div.alert[auto-close]');
-                  alert.each(function() {
-                    var that = $(this);
-                    var time_period = that.attr('auto-close');
-                    setTimeout(function() {
-                      that.alert('close');
-                    }, time_period);
-                  });
-                });
-
-                const removeBtn = document.querySelectorAll('.remove')
-                
-                  for (let i = 0; i < removeBtn.length; i++) {
-                      //console.log('test')
-                        removeBtn[i].addEventListener("click", function(e) {
-                          e.currentTarget.parentNode.parentNode.parentNode.parentNode.remove();
-                      }, false);
-                  }
-
-            }).catch(err => {
-            console.error('Error: ', err);
-            alert(err);
-        });
-      }
-
-      
-      function getSecImage() {
-        document.querySelector('.album .container .row').innerHTML = ''
-        const userText = document.querySelector('#getText').value
-        let url
-
-        if (userText !== ''){
-          url = `http://www.splashbase.co/api/v1/images/search?query=${userText}`
-        }else url = 'http://www.splashbase.co/api/v1/images/search?query=house'
-        
-        fetch(url)
-            .then(res => res.json())
-            .then(data => {
                 //console.log(data.images)
-                
 
                 for (let index = 0; index < data.images.length; index++) {
                     const element = data.images[index];
@@ -586,23 +483,14 @@
                             </p>
                             <div class="d-flex justify-content-between align-items-center">
                             <div class="btn-group">
-                                <button type="button" class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#myModal${index}">
+                                <button type="button" class="btn btn-sm btn-outline-secondary">
                                 View
                                 </button>
                                 <button type="button" class="btn btn-sm btn-outline-secondary remove">
-                                Hide
+                                Edit
                                 </button>
-                                <div id="myModal${index}" class="modal fade" tabindex="-1" role="dialog">
-                                  <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-body">
-                                            <img src=${element.url} class="img-responsive bd-placeholder-img card-img-top" width="100%" height="225" />
-                                        </div>
-                                    </div>
-                                  </div>
-                                </div>
                             </div>
-                            <small class="text-muted">${element.id}</small>
+                            <small class="text-muted">9 mins</small>
                             </div>
                         </div>
                     </div>`
@@ -610,45 +498,11 @@
                     document.querySelector('.album .container .row').appendChild(content)
                 }
 
-                let al = document.createElement('div')
-                
-                al.innerHTML = 
-                `
-                  <div id="moo" class="alert alert-danger alert-dismissible w-25 text-center" style="margin: 0 auto" role="alert" auto-close="5000">
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span>
-                    </button>
-                    ${data.images.length} images loaded
-                  </div>
-                `
-                  document.querySelector('body').insertBefore(al,document.querySelector('main'))
-                
-                $(function() {
-                  var alert = $('div.alert[auto-close]');
-                  alert.each(function() {
-                    var that = $(this);
-                    var time_period = that.attr('auto-close');
-                    setTimeout(function() {
-                      that.alert('close');
-                    }, time_period);
-                  });
-                });
-                
-
-                const removeBtn = document.querySelectorAll('.remove')
-                
-                  for (let i = 0; i < removeBtn.length; i++) {
-                      console.log('test')
-                        removeBtn[i].addEventListener("click", function(e) {
-                          e.currentTarget.parentNode.parentNode.parentNode.parentNode.remove();
-                      }, false);
-                  }
-
             }).catch(err => {
             console.error('Error: ', err);
-            alert(err);
         });
-
       }
+
 
   </script>
 </body>

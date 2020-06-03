@@ -107,46 +107,9 @@
                     `
                 });
 
-                const addCartBtn = document.querySelectorAll('.addToCart')
-                const cartContainer = document.querySelector('#cartContainer')
+                updateCart()
 
-                for (let i = 0; i < addCartBtn.length; i++) {
-                    addCartBtn[i].addEventListener("click", function(e) {
-                        cartContainer.innerHTML +=
-                        `<div class="col col-md-6 card my-3 shadow-sm px-3 pt-3">
-                            <img class="bd-placeholder-img card-img-top" width="100%" height="225" src=${e.currentTarget.parentNode.parentNode.parentNode.querySelector('img').src} />
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center btn-group">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary removeFromCart">
-                                        Remove From Cart
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        `
-                        
-                    
-                        const removeFromCart = document.querySelectorAll('.removeFromCart')
-                        
-                        for (let i = 0; i < removeFromCart.length; i++) {
-                            //console.log('test')
-                            removeFromCart[i].addEventListener("click", function(e) {
-                                e.currentTarget.parentNode.parentNode.parentNode.remove();
-                            }, false);
-                        }
-                        //console.log(cartContainer)
-                    }, false);
-
-                }
-
-                const removeBtn = document.querySelectorAll('.remove')
-                
-                  for (let i = 0; i < removeBtn.length; i++) {
-                      //console.log('test')
-                        removeBtn[i].addEventListener("click", function(e) {
-                          e.currentTarget.parentNode.parentNode.parentNode.remove();
-                      }, false);
-                  }
+                updateProd()
 
                 
             }).catch(err => {
@@ -182,34 +145,32 @@
                     `
             })
 
-            const removeFromCart = document.querySelectorAll('.remove')
-                        
-            for (let i = 0; i < removeFromCart.length; i++) {
-                //console.log('test')
-                removeFromCart[i].addEventListener("click", function(e) {
-                    e.currentTarget.parentNode.parentNode.parentNode.remove();
-                }, false);
-            }
+            
+            updateCart()
 
-                        
+            updateProd()
+        
+        }
+
+        const updateCart = () => {
+
             const addCartBtn = document.querySelectorAll('.addToCart')
             const cartContainer = document.querySelector('#cartContainer')
 
             for (let i = 0; i < addCartBtn.length; i++) {
                 addCartBtn[i].addEventListener("click", function(e) {
-                    cartContainer.innerHTML +=
-                    `<div class="col col-md-6 card my-3 shadow-sm px-3 pt-3">
-                        <img class="bd-placeholder-img card-img-top" width="100%" height="225" src=${e.currentTarget.parentNode.parentNode.parentNode.querySelector('img').src} />
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center btn-group">
-                                <button type="button" class="btn btn-sm btn-outline-secondary removeFromCart">
-                                    Remove From Cart
-                                </button>
-                            </div>
+                cartContainer.innerHTML +=
+                `<div class="col col-md-6 card my-3 shadow-sm pt-3">
+                    <img class="bd-placeholder-img card-img-top" width="100%" height="50" src=${e.currentTarget.parentNode.parentNode.parentNode.querySelector('img').src} />
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center btn-group">
+                            <button type="button" class="btn btn-sm btn-outline-secondary removeFromCart">
+                                Remove
+                            </button>
                         </div>
                     </div>
-                    `
-                    
+                </div>
+                `
                 
                     const removeFromCart = document.querySelectorAll('.removeFromCart')
                     
@@ -223,8 +184,19 @@
                 }, false);
 
             }
-        
         }
+
+    const updateProd = () => {
+        const removeBtn = document.querySelectorAll('.remove')
+            
+        for (let i = 0; i < removeBtn.length; i++) {
+            //console.log('test')
+            removeBtn[i].addEventListener("click", function(e) {
+                e.currentTarget.parentNode.parentNode.parentNode.remove();
+            }, false);
+        }
+    }
+
 </script>
 </body>
 

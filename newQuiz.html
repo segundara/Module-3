@@ -166,7 +166,7 @@
         </div>
         <div class="input-group">
             <label for="trivia_category">Select Category: </label>
-            <select class="custom-select" id="inputGroupSelect02" aria-label="Example select with button addon">
+            <select class="custom-select" id="category" aria-label="Example select with button addon">
                 <option value="">Any Category</option>
                 <option value="9">General Knowledge</option>
                 <option value="10">Entertainment: Books</option>
@@ -196,7 +196,7 @@
         </div>
         <div class="input-group">
             <label for="trivia_difficulty">Select Difficulty: </label>
-            <select class="custom-select" id="inputGroupSelect03" aria-label="Example select with button addon">
+            <select class="custom-select" id="difficulty_level" aria-label="Example select with button addon">
                 <option value="">Any Difficulty</option>
                 <option value="easy">Easy</option>
                 <option value="medium">Medium</option>
@@ -205,7 +205,7 @@
         </div>
         <div class="input-group">
             <label for="trivia_type">Select Type: </label>
-            <select class="custom-select" id="inputGroupSelect04" aria-label="Example select with button addon">
+            <select class="custom-select" id="question_type" aria-label="Example select with button addon">
               <option value="">Any Type</option>
               <option value="multiple">Multiple</option>
               <option value="boolean">True/False</option>
@@ -240,11 +240,11 @@
       function startQuiz() {
         
         let a = document.querySelector('#trivia_amount').value;
-        let b = document.querySelector('#inputGroupSelect02').value;
-        let c = document.querySelector('#inputGroupSelect03').value;
-        let d = document.querySelector('#inputGroupSelect04').value;
+        let b = document.querySelector('#category').value;
+        let c = document.querySelector('#difficulty_level').value;
+        let d = document.querySelector('#question_type').value;
         
-        document.querySelector('.control').style.display = 'block'
+        // document.querySelector('.control').style.display = 'block'
         document.querySelector('.pre').style.display = 'none'
           
       
@@ -387,6 +387,9 @@
       submitButton.addEventListener('click', displayResult);
       previousButton.addEventListener("click", showPreviousSlide);
       nextButton.addEventListener("click", showNextSlide);
+
+      
+      document.querySelector('.control').style.display = 'block'
 
     }).catch(err => {
         console.error('Error: ', err);

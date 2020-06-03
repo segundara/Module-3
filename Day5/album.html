@@ -493,7 +493,7 @@
             </div>
             <div id="track-list" class="col py-3 px-3">
                 <div class="card link"></div>
-                <div class="input-group py-3">
+                <!-- <div class="input-group py-3">
                     <select class="custom-select" id="inputGroupSelect04" aria-label="Example select with button addon">
                       <option value="eminem">Eminem</option>
                       <option value="metallica">Metallica</option>
@@ -502,7 +502,7 @@
                     <div class="input-group-append">
                       <button class="btn btn-outline-secondary" type="button" id="getList">Choose Artist</button>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
         
@@ -631,52 +631,17 @@
     </script>
 
 <script>
-    
-        // window.onload = function () {
-        //     let main = document.querySelector('.link')
-        //     let d_name = ['eminem','metallica','behemoth']
-        //     d_name.forEach(element => {
-        //         fetch(`https://deezerdevs-deezer.p.rapidapi.com/search?q=${element}`, {
-        //         "method": "GET",
-        //         "headers": {
-        //             "x-rapidapi-host": "deezerdevs-deezer.p.rapidapi.com",
-        //             "x-rapidapi-key": "5a59d0425fmsh5f3822ebf9b2e14p17343ajsn307759a80b6e"
-        //         }
-        //     })
-        //     .then(out => {
+    const myList = document.querySelector('#track-list')
+    const coverDiv = document.createElement('div')
+    coverDiv.className = 'card'
 
-        //         let ul = document.createElement('ul')
-        //         ul.className = 'list-group'
+    window.onload = () => {
+        const urlParam = new URLSearchParams(window.location.search)
+        const id = urlParam.get('id')
 
-        //         let li = document.createElement('li')
-        //         li.className = 'list-group-item'
-        //         li.innerText = out.url
-        //         li.style.color = 'black'
-        //         ul.appendChild(li)
-        //         main.appendChild(ul)
-        //     })
-        //     .catch(err => {
-        //         console.log(err);
-        //     });
-        //     });
-            
-        // }
-
-
-        const myList = document.querySelector('#track-list')
-        const coverDiv = document.createElement('div')
-        coverDiv.className = 'card'
-        const trackBtn = document.querySelector('#getList')
-        
-        trackBtn.addEventListener('click', getTrack);
-       
-        
-
-        function getTrack(){
-        const name = document.querySelector('#inputGroupSelect04').value;
         coverDiv.innerHTML = ''
 
-        const url = `https://deezerdevs-deezer.p.rapidapi.com/search?q=${name}`
+        const url = `https://deezerdevs-deezer.p.rapidapi.com/album/` + id
 
         fetch(url, {
         "method": "GET",
@@ -687,12 +652,34 @@
         })
         .then(res => res.json())
         .then(output => {
-            for (let x = 0; x < output.data.length; x++) {
-                const element = output.data[x];
+            console.log(output)
+            
+            //console.log(output.tracks.data[0].artist.id)
+
+            let albumCover = document.querySelector('#display-album')
+
+            albumCover.innerHTML = ''
+            
+            albumCover.innerHTML =
+            `<div class="card mt-5 ml-4">
+                <a href="artist.html?id=${output.tracks.data[0].artist.id}">
+                    <img style="object-fit: cover!important;" class="w-100" src="https://api.deezer.com/album/${id}/image"/>
+                    <p>${output.tracks.data[0].title}</p>
+                    <small>${output.tracks.data[0].artist.name}</small>
+                </a>
+                    <button type="button" class="btn">PLAY</button>
+                    <small>${output.release_date.substr(0, 4)} . ${output.nb_tracks} SONGS</small>
+                    <p><i class="fa fa-heart-o"></i><span class="px-2"></span><i class="fa fa-ellipsis-h"></i></p>
+            </div>
+            `
+
+            for (let x = 0; x < output.tracks.data.length; x++) {
+                const element = output.tracks.data[x];
                 console.log(element.title)
                 console.log(element.duration)
                 console.log((element.duration / 60).toFixed(2))
                 console.log(element.artist.name)
+                console.log(element)
 
                 let outerDiv = document.createElement('div')
                 let innerDiv = document.createElement('div')
@@ -718,13 +705,22 @@
             
                 myList.appendChild(coverDiv)
             }
-            // console.log(output.data[0]);
+            console.log(output.data[0]);
         })
         .catch(err => {
             console.log(err);
         });
-
     }
+
+        // const myList = document.querySelector('#track-list')
+        // const coverDiv = document.createElement('div')
+        // coverDiv.className = 'card'
+        // const trackBtn = document.querySelector('#getList')
+        
+        // trackBtn.addEventListener('click', getTrack);
+       
+        
+
 
 </script>
 

@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>CD Collection</title>
+
+    <style>
+        .card {
+            border: 1px solid darkgray;
+            text-align: center;
+            min-height: 50px;
+            line-height: 50px;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <input type="text" id="search" placeholder="searchMe!" autocomplete="off" onkeyup="filterStuff()">
+    <div id="totalDuration"></div>
+    <div class="row" id="details"></div>
+
+    <ul id="songNames">
+
+    </ul>
+
+    <div class="container">
+        <div class="row" id="cardContainer">
+
+        </div>
+
+
+    </div>
+    </div>
+
+    <script>
+        window.onload = () => {
+            loadTracks("Metallica")
+        }
+
+
+        let loadedSongs = []
+
+        const loadTracks = artist => {
+            fetch("https://deezerdevs-deezer.p.rapidapi.com/search?q=" + artist, {
+                    "method": "GET",
+                    "headers": {
+                        "x-rapidapi-host": "deezerdevs-deezer.p.rapidapi.com",
+                        "x-rapidapi-key": "575de39080mshf1f9cab8127c63fp1bcad8jsn113d9f3f814b"
+                    }
+                })
+                .then(response => response.json())
+                .then(json => {
+                    const cardContainer = document.querySelector("#cardContainer")
+                    const songName = document.querySelector("#songNames")
+
+                    loadedSongs = json.data;
+                    calculateDuration(loadedSongs)
+
+                    const albums = loadedSongs.map(song => song.album)
+
+                    //NAVIGATION
+                    loadedSongs.forEach(currentSong => {
+                        cardContainer.innerHTML += `
+                     <div class="col-sm-3 col-md-2 card" >
+                        <a href="details.html?songId=${currentSong.id}">
+                         <img src="${currentSong.album.cover}">
+                         </a>
+                       <div onclick="detailMe(${currentSong.id})"> ${currentSong.title} </div>
+                     </div>
+                 `
+                    })
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+        }
+
+
+
+        const filterStuff = () => {
+            const filterSearch = document.querySelector("#search").value.toLowerCase()
+            const cardContainer = document.querySelector("#cardContainer")
+            cardContainer.innerHTML = "";
+
+            const filteredSongs = loadedSongs.filter(song => song.title.toLowerCase().includes(filterSearch))
+
+            filteredSongs.forEach(currentSong => {
+                cardContainer.innerHTML += `
+                <div class="col-sm-3 col-md-2 card" >
+                        <a href="details.html?songId=${currentSong.id}">
+                         <img src="${currentSong.album.cover}">
+                         </a>
+                       <div onclick="detailMe(${currentSong.id})"> ${currentSong.title} </div>
+                     </div>
+            `
+            })
+            calculateDuration(filteredSongs)
+        }
+
+        const detailMe = id => {
+            const details = document.querySelector("#details")
+            const selectedSong = loadedSongs.find(x => x.id == id)
+
+            const {
+                duration
+            } = selectedSong
+
+
+            details.innerHTML = `
+            <div> ${selectedSong.title} - ${formatDuration(duration)}
+                <img src="${selectedSong.album.cover}" >
+            </div>
+        `
+        }
+
+        const calculateDuration = (songs) => {
+            const totalDurationDiv = document.getElementById('totalDuration')
+            totalDurationDiv.innerHTML = `Total duration: ${formatDuration(songs.reduce((accumulator, currentItem) => accumulator +
+                        parseInt(
+                            currentItem.duration), 0))} minutes`
+        }
+
+        const formatDuration = duration => {
+
+            const hours = Math.floor(duration / 60 / 60)
+
+            const minutes = Math.floor(duration / 60) - (hours * 60)
+
+            const seconds = duration % 60
+
+            return formattedDuration =
+                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+        }
+    </script>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
+    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+    </script>
+</body>
+
+</html>
